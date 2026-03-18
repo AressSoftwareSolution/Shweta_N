@@ -33,7 +33,7 @@ def update():
     id=int(input("enter ID"))
     name=input("updated name:")
     age=int(input("updated age:"))
-    genderinput("updated gender:")
+    gender=input("updated gender:")
     cur.execute("UPDATE STUDENTS SET NAME=?,AGE=?,GENDER=? WHERE ID=?",(name,age,gender,id))
     con.commit()
     
