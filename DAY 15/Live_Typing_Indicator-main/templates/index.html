@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Live Typing Indicator</title>
+
+<style>
+
+body{
+    font-family: Arial;
+    background:#e5ddd5;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+.chat-container{
+    width:420px;
+    background:white;
+    border-radius:12px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.2);
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+}
+.header{
+    background:#075e54;
+    color:white;
+    padding:15px;
+    font-weight:bold;
+}
+.chat-area{
+    height:300px;
+    padding:15px;
+    overflow-y:auto;
+    background:#f7f7f7;
+}
+.message{
+    background:#dcf8c6;
+    padding:8px 12px;
+    border-radius:10px;
+    margin-bottom:10px;
+    width:fit-content;
+}
+.input-area{
+    padding:10px;
+    border-top:1px solid #ddd;
+}
+input{
+    width:100%;
+    padding:10px;
+    border-radius:8px;
+    border:1px solid #ccc;
+}
+
+#typing{
+    font-size:13px;
+    color:gray;
+    margin-top:5px;
+    font-style:italic;
+}
+</style>
+<script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+</head>
+<body>
+<div class="chat-container">
+<div class="header">
+Live Chat Demo
+</div>
+<div class="chat-area" id="chat"></div>
+
+<div class="input-area">
+
+<input id="username" placeholder="Enter username">
+
+<br><br>
+
+<input id="message" placeholder="Type a message...">
+
+<p id="typing"></p>
+
+</div>
+
+</div>
+
+<script>
+
+const socket = io()
+
+const usernameInput = document.getElementById("username")
+const messageInput = document.getElementById("message")
+const typingText = document.getElementById("typing")
+const chatArea = document.getElementById("chat")
+
+let typingTimeout
+
+messageInput.addEventListener("input", () => {
+
+    const username = usernameInput.value || "Anonymous"
+
+    socket.emit("typing", {username: username})
+
+    clearTimeout(typingTimeout)
+
+    typingTimeout = setTimeout(() => {
+        socket.emit("stop_typing", {username: username})
+    }, 2000)
+
+})
+
+socket.on("user_typing", (data) => {
+
+    typingText.innerText = data.username + " is typing..."
+
+})
+
+socket.on("user_stop_typing", () => {
+
+    typingText.innerText = ""
+
+})
+</script>
+</body>
+</html>

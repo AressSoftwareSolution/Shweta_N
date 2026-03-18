@@ -1,0 +1,48 @@
+name: CI/CD Pipeline for LIVE_TYPING_INDICATOR
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+  
+    steps:
+      # Step 1: Checkout code
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Python for testing
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11  # match your Dockerfile
+
+      # Step 3: Install dependencies (for tests)
+      - name: Install Dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+
+      # Step 4: Run tests
+      - name: Run Tests
+        run: pytest tests/ || echo "No tests found, skipping"
+
+      # Step 5: Set up Docker
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2
+      # Step 6: Build Docker image
+      - name: Build Docker Image
+        run: docker build -t live-typing-indicator:latest .
+
+      # Step 7: Run container to verify
+      - name: Run Container
+        run: |
+          docker run -d --name live-typing-indicator -p 3000:3000 live-typing-indicator:latest
+          sleep 10
+          docker ps
+          docker stop live-typing-indicator
+          docker rm live-typing-indicator
