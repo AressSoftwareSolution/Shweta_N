@@ -1,0 +1,4 @@
+INFO:root:file processor is started
+INFO:root:performing a file handling operation
+INFO:root: read successfully.
+INFO:root:content appended sucessfully
